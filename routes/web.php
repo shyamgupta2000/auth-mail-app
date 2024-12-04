@@ -1,11 +1,9 @@
 <?php
 
+use App\Http\Controllers\SendMailController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
-use Laravel\Socialite\Facades\Socialite;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,42 +16,14 @@ Route::post('/register',action: [UserController::class, 'registerSave'])->name('
 Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/forgot-password', [UserController::class, 'forgotPassword'])->name('forgotPassword');
 Route::post('/forgot-password', [UserController::class, 'forgotPasswordSave'])->name('forgotPasswordSave');
-Route::get('/dashobard', [UserController::class, 'dashboard'])->name('dashboard');
 
 // GitHub Redirect
-Route::get('/auth/github/redirect', function () {
-    return Socialite::driver('github')->redirect();
-});
+Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->where('provider', 'google|github|twitter');
+
 // GitHub Callback
-Route::get('/auth/github/callback', function () {
-    try {
-        $socialiteUser = Socialite::driver('github')->user();
+Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])->where('provider', 'google|github|twitter');
 
-        $validator = Validator::make(
-            ['email' => $socialiteUser->getEmail()],
-            ['email' => ['unique:users,email']],
-            ['email.unique' => 'Coudn\'t log in. Maybe you used a different login method?']
-        );
-
-        $user = User::firstOrCreate(
-            [
-                'provider_id' => $socialiteUser->getId(),
-                'provider' => 'github',
-            ],
-            [
-                'name' => $socialiteUser->getName(),
-                'email' => $socialiteUser->getEmail(),
-                'email_verified_at' => now(),
-            ]
-        );
-
-        Auth::login($user);
-
-        return redirect()->route('dashboard');
-    } catch (\Exception $e) {
-        // Log the error for debugging
-        \Log::error('GitHub OAuth Error: ' . $e->getMessage());
-
-        return redirect()->route('login')->with('error', 'Authentication failed. Please try again.');
-    }
-});
+Route::get('/dashobard', [UserController::class, 'dashboard'])->name('dashboard');
+Route::get('sendMail', [SendMailController::class, 'index'])->name('sendMail.index');
+Route::get('send-email', [SendMailController::class, 'sendEmail'])->name('sendEmail.send');
+Route::post('sendMailData', [SendMailController::class, 'fetchMailData'])->name('fetchMail.data');

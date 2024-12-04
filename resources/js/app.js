@@ -5,6 +5,7 @@ fontAwesomeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7
 fontAwesomeScript.async = true;
 document.head.appendChild(fontAwesomeScript);
 
+
 const themes = [
     {
         background: "#1A1A2E",
