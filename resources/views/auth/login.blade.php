@@ -19,7 +19,7 @@
                     class="absolute top-[-14%] right-0 w-4/5" 
                 />
                 <!-- Title -->
-                <h1 class="opacity-60 text-4xl mb-4">LOGIN</h1>
+                <h1 class="opacity-60 text-4xl mb-4">LOGINS</h1>
                 
                 <!-- Form -->
                 <form action="{{ route('loginSave') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
